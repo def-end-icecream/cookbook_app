@@ -5,3 +5,13 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+
+recipe = Recipe.new(
+  title: "Mud Pie",
+  ingredients: "Mud",
+  directions: "Bake the mud, enjoy!",
+  chef: "Dani Zaghian",
+  prep_time: 15
+)
+recipe.save
