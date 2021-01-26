@@ -2,24 +2,17 @@ class Api::RecipesController < ApplicationController
 
   def index
     @recipes = Recipe.all
-
     if params[:search]
       @recipes = Recipe.where("title iLIKE ?", "%#{params[:search]}%")
     end
-
     @recipes = @recipes.order(:id)
-
     render "index.json.jb"
   end
 
   def show
-    if current_user
-      recipe_id = params[:id]
-      @recipe = Recipe.find_by(id: recipe_id)
-      render "show.json.jb"
-    else
-      render json: {}, status: :unauthorized
-    end
+    recipe_id = params[:id]
+    @recipe = Recipe.find_by(id: recipe_id)
+    render "show.json.jb"
   end
 
   def create
@@ -29,10 +22,14 @@ class Api::RecipesController < ApplicationController
       ingredients: params[:ingredients],
       directions: params[:directions],
       chef: params[:chef],
-      prep_time: params[:prep_time]
+      prep_time: params[:prep_time],
+      user_id: current_user.id
     )
-    @recipe.save
-    render "show.json.jb"
+    if @recipe.save
+      render "show.json.jb"
+    else
+      render json: {errors: @recipe.errors.full_messages}, status: 422
+    end
   end
 
   def update

@@ -1,4 +1,7 @@
 class Recipe < ApplicationRecord
+
+  belongs_to :user
+
   # model method/instance method
   def ingredients_list
     ingredients.split(", ").map { |ingredient| ingredient.capitalize }
