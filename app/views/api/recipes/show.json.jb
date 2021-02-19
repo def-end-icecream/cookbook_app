@@ -1,10 +1,8 @@
-{
-  id: @recipe.id,
-  title: @recipe.title,
-  ingredients: @recipe.ingredients,
-  directions: @recipe.directions,
-  prep_time: @recipe.prep_time,
-  created_at: @recipe.created_at,
-  user_id: @recipe.user_id,
-  image_url: @recipe.image_url
-}
+recipe = render partial: "recipe.json.jb", locals: { recipe: @recipe }
+recipe[:user] = render partial: "api/users/user.json.jb", locals: { user: @recipe.user }
+
+if current_user
+  recipe[:owner] = @recipe.user_id == current_user.id
+end
+
+recipe
