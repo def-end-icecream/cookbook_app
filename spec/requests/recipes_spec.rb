@@ -17,6 +17,43 @@ RSpec.describe "Recipes", type: :request do
       expect(recipes.length).to eq(3)
     end
   end
+  describe "POST /recipes" do
+    it "creates a new recipe when a user is logged in with valid data" do
+      jwt = JWT.encode(
+        {user_id: User.first.id},
+        Rails.application.credentials.fetch(:secret_key_base), 
+        "HS256"
+      )
+      post "/api/recipes", params: {
+        title: "Example title", 
+        ingredients: "Example ingredients", 
+        directions: "Example directions", 
+        prep_time: 10
+      }, headers: {"Authorization" => "Bearer #{jwt}"}
+
+      recipe = JSON.parse(response.body)
+      expect(response).to have_http_status(200)
+      expect(recipe["title"]).to eq("Example title")
+    end
+    it "returns an error status when a user is logged in with invalid data" do
+      jwt = JWT.encode(
+        {user_id: User.first.id},
+        Rails.application.credentials.fetch(:secret_key_base), 
+        "HS256"
+      )
+      post "/api/recipes", params: {
+        ingredients: "Example ingredients", 
+        directions: "Example directions", 
+        prep_time: 10
+      }, headers: {"Authorization" => "Bearer #{jwt}"}
+
+      expect(response).to have_http_status(422)
+    end
+    it "returns an error status when a user is not logged in" do
+      post "/api/recipes", params: {}
+      expect(response).to have_http_status(401)
+    end
+  end
   describe "GET /recipes/:id" do 
     it "should return a hash with the appropriate attributes" do
       get "/api/recipes/#{Recipe.first.id}"
